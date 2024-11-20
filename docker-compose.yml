@@ -1,11 +1,11 @@
 services:
   tw1zt3ds_iptv:
-    image: ghcr.io/tw1zt3d2four7/tw1zt3ds_iptv/tw1zt3ds_iptv:ddy
-    container_name: tw1zt3ds_iptv_ddy
+    image: ghcr.io/tw1zt3d2four7/tw1zt3ds_iptv/tw1zt3ds_iptv:latest
+    container_name: tw1zt3ds_iptv
     pull_policy: always
     restart: unless-stopped
     ports:
-      - "3037:3037"  # Expose port 5000 for accessing the Flask app
+      - "3036:3036"  # Expose port 5000 for accessing the Flask app
     #command: gunicorn Tw1zT3ds_IPTV:app --workers 3 --bind 0.0.0.0:3036 --log-level info --access-logfile - --error-logfile - 
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128

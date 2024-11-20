@@ -26,21 +26,14 @@ M3U_FILE = os.path.join(DOWNLOAD_DIR, 'm3u_playlist.m3u')
 EPG_FILE = os.path.join(DOWNLOAD_DIR, 'epg.xml')
 
 # URLs for downloading M3U and EPG
-M3U_URL = "https://bit.ly/ddy-m3u1-all"
-EPG_URL = "https://bit.ly/ddy-epg1"
+M3U_URL = "https://bit.ly/moj-m3u8"
+EPG_URL = "https://bit.ly/moj-epg"
 
 # Max age for files in seconds (12 hours)
 MAX_FILE_AGE = 12 * 60 * 60  # 12 hours in seconds
 
 # Path to store the last download timestamp
 LAST_DOWNLOAD_TIMESTAMP_FILE = 'last_download_timestamp.json'
-
-# Custom headers for download and streaming
-HEADERS = {
-    'Referer': 'https://ilovetoplay.xyz/',
-    'Origin': 'https://ilovetoplay.xyz',
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
-}
 
 def load_last_download_time():
     """Load the last download timestamp from the file, if it exists."""
@@ -76,10 +69,10 @@ def ensure_files_exist():
         app.logger.info("Files are up-to-date based on the last download time.")
 
 def download_m3u():
-    """Download the M3U file from the URL with headers."""
+    """Download the M3U file from the URL."""
     try:
         app.logger.info(f"Downloading M3U file from {M3U_URL}...")
-        response = requests.get(M3U_URL, headers=HEADERS)
+        response = requests.get(M3U_URL)
         response.raise_for_status()  # Will raise an HTTPError if the status is 4xx/5xx
         with open(M3U_FILE, 'wb') as file:
             file.write(response.content)
@@ -88,10 +81,10 @@ def download_m3u():
         app.logger.error(f"Error downloading M3U: {e}")
 
 def download_epg():
-    """Download the EPG file from the URL with headers."""
+    """Download the EPG file from the URL."""
     try:
         app.logger.info(f"Downloading EPG file from {EPG_URL}...")
-        response = requests.get(EPG_URL, headers=HEADERS)
+        response = requests.get(EPG_URL)
         response.raise_for_status()  # Will raise an HTTPError if the status is 4xx/5xx
         with open(EPG_FILE, 'wb') as file:
             file.write(response.content)
@@ -104,14 +97,14 @@ def download_epg():
 def serve_m3u():
     """Serve the M3U playlist file."""
     ensure_files_exist()  # Ensure files are downloaded before serving
-    app.logger.info(f"Serving M3U playlist at http://0.0.0.0:3037/playlist.m3u")
+    app.logger.info(f"Serving M3U playlist at http://0.0.0.0:3036/playlist.m3u")
     return send_file(M3U_FILE, mimetype='application/x-mpegURL')
 
 @app.route('/epg.xml')
 def serve_epg():
     """Serve the EPG XML file."""
     ensure_files_exist()  # Ensure files are downloaded before serving
-    app.logger.info(f"Serving EPG XML at http://0.0.0.0:3037/epg.xml")
+    app.logger.info(f"Serving EPG XML at http://0.0.0.0:3036/epg.xml")
     return send_file(EPG_FILE, mimetype='application/xml')
 
 @app.route('/stream/<path:url>')
@@ -120,10 +113,6 @@ def stream(url):
     try:
         ffmpeg_command = [
             'ffmpeg',
-            '-user_agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
-            '-referer', 'https://ilovetoplay.xyz/',
-            '-headers', 'Origin: https://ilovetoplay.xyz',  # Custom headers for streaming
-            '-headers', 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
             '-i', url,  # Input stream URL
             '-reconnect', '1',
             '-reconnect_streamed', '1',
@@ -134,25 +123,25 @@ def stream(url):
             '-thread_queue_size', '4096',
             '-rtbufsize', '2048k',
             '-map', '0',
-            '-c:v', 'copy',
-            '-c:a', 'ac3',
-            '-b:a', '128k',
-            '-ac', '2',
+            '-c:v', 'copy',             # Video codec: copy
+            '-c:a', 'ac3',              # Audio codec: ac3
+            '-b:a', '128k',             # Audio bitrate: 128k
+            '-ac', '2',                 # Audio channels: 2
             '-strict', '-2',
-            '-pix_fmt', 'yuv420p',
+            '-pix_fmt', 'yuv420p',      # Pixel format
             '-bf', '0',
-            '-preset', 'llhp',
-            '-tune', 'ull',
-            '-rc', 'cbr',
+            '-preset', 'llhp',          # Low latency high performance preset
+            '-tune', 'ull',             # Ultra low latency tune
+            '-rc', 'cbr',               # Constant bitrate control
             '-multipass', 'disabled',
             '-fflags', '+genpts',
             '-timeout', '7000000',
             '-muxdelay', '0.001',
             '-max_interleave_delta', '0',
-            '-f', 'mpegts',
-            '-async', '1',
-            '-copyts',
-            'pipe:1'  # Output to pipe (for streaming)
+            '-f', 'mpegts',             # Output format: mpegts
+            '-async', '1',              # Sync audio and video
+            '-copyts', 
+            'pipe:1'                    # Output to pipe (for streaming)
         ]
         
         # Run FFmpeg and stream to the player
@@ -178,11 +167,11 @@ if __name__ == "__main__":
     
     # Print the URLs to the console before starting the Flask app
     app.logger.info(f"Flask app is running at:")
-    app.logger.info(f"  M3U URL: http://0.0.0.0:3037/playlist.m3u")
-    app.logger.info(f"  EPG URL: http://0.0.0.0:3037/epg.xml")
+    app.logger.info(f"  M3U URL: http://0.0.0.0:3036/playlist.m3u")
+    app.logger.info(f"  EPG URL: http://0.0.0.0:3036/epg.xml")
     
     # Start a background thread to check and update the files every 12 hours
     threading.Thread(target=schedule_file_check, daemon=True).start()
     
-    app.run(host='0.0.0.0', port=3037)
+    app.run(host='0.0.0.0', port=3036)
 
