@@ -9,11 +9,4 @@ http://0.0.0.0:3035/playlist.m3u
 & 
 http://0.0.0.0:3036/epg.xml
 
-____________________________________________________
-
-If using the #tag " :ddy " then use the links below:
-
-http://0.0.0.0:3037/playlist.m3u 
-& 
-http://0.0.0.0:3037/epg.xml
 
