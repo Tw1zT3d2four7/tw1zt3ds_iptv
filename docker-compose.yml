@@ -5,12 +5,12 @@ services:
     pull_policy: always
     restart: unless-stopped
     ports:
-      - "3036:3036"  # Expose port 5000 for accessing the Flask app
+      - "3037:3037"  # Expose port 5000 for accessing the Flask app
     #command: gunicorn Tw1zT3ds_IPTV:app --workers 3 --bind 0.0.0.0:3036 --log-level info --access-logfile - --error-logfile - 
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
     volumes:
-      - m3u_epg_files:/app/M3U_&_EPG_Files  # Named volume for persistence
+      - ./config.yml:/config/config.yml #You will need to have the config.yml in place before docker compose up
     environment:
       - FLASK_APP=Tw1zT3ds_IPTV.py  # Flask app entry point
       - FLASK_RUN_HOST=0.0.0.0  # Make the app accessible on all interfaces
@@ -19,5 +19,4 @@ services:
       - PGID=1000
       - TZ=America/New_York
       - VERSION=docker
-volumes:
-  m3u_epg_files:  # Named volume to persist M3U and EPG files
+

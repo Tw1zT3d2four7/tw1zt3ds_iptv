@@ -1,0 +1,42 @@
+# Configuration for M3U and EPG sources
+sources:
+  m3u_url: "YOUR M3U URL GOES HERE"
+  epg_url: "YOUR EPG URL GOES HERE"
+
+# Flask server settings
+flask_server:
+  ip_address: "0.0.0.0" # YOUR PC'S IP GOES HERE
+  port: 3037 #CHANGE THE PORT IF YOU NEED TO
+
+# FFmpeg command profile settings "DON'T TOUCH UNLESS YOU KNOW WHAT YOUR DOING!!"
+ffmpeg:
+  command:
+    input_url: "{url}"
+    reconnect: "1"
+    reconnect_streamed: "1"
+    reconnect_delay_max: "4294"
+    analyzeduration: "10000000"
+    probesize: "10000000"
+    re: "1"
+    thread_queue_size: "4096"
+    rtbufsize: "2048k"
+    map: "0"
+    video_codec: "libx264"
+    audio_codec: "ac3"
+    audio_bitrate: "128k"
+    audio_channels: "2"
+    strict: "experimental"
+    pix_fmt: "yuv420p"
+    bf: "2"
+    preset: "llhp"
+    tune: "ull"
+    rc: "vbr"
+    multipass: "1"
+    fflags: "discardcorrupt"
+    timeout: "10"
+    muxdelay: "0.1"
+    max_interleave_delta: "0.1"
+    output_format: "mpegts"
+    async: "1"
+    copyts: "1"
+
