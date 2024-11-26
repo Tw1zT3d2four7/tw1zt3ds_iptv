@@ -10,7 +10,7 @@ services:
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
     volumes:
-      - ./config.yml:/config/config.yml #You will need to have the config.yml in place before docker compose up
+      - ./config.yml:/config/config.yml
     environment:
       - FLASK_APP=Tw1zT3ds_IPTV.py  # Flask app entry point
       - FLASK_RUN_HOST=0.0.0.0  # Make the app accessible on all interfaces

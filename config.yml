@@ -1,42 +1,105 @@
 # Configuration for M3U and EPG sources
 sources:
-  m3u_url: "YOUR M3U URL GOES HERE"
-  epg_url: "YOUR EPG URL GOES HERE"
-
-# Flask server settings
+  m3u_url: "https://starlite.best/api/list/USERNAME GOES HERE/PASSWORD GOES HERE/m3u8/livetv"
+  epg_url: "https://epg.starlite.best/utc.xml"
+  
+# Flask server configuration
 flask_server:
-  ip_address: "0.0.0.0" # YOUR PC'S IP GOES HERE
-  port: 3037 #CHANGE THE PORT IF YOU NEED TO
+  ip_address: "0.0.0.0"  # Replace with your server's IP address
+  port: 3037                  # Replace with your desired port
 
-# FFmpeg command profile settings "DON'T TOUCH UNLESS YOU KNOW WHAT YOUR DOING!!"
+# Playlist groups to include or exclude (with booleans)
+playlist_groups:
+  Africa: false
+  Albania: false
+  Arabic: false
+  Australia: false
+  Belgium: false
+  Brazil: false
+  Canada: false
+  Canada French: false
+  Caribbean: false
+  Documentary: false
+  EX-USSR: false
+  EX-YU: false
+  Entertainment: false
+  Filipino: false
+  France: false
+  Germany: false
+  Greece: false
+  India: false
+  Israel: false
+  Italy: false
+  Kids: false
+  Latino: false
+  Macedonia: false
+  Music: false
+  Netherlands: false
+  News: false
+  Nordic: false
+  Poland: false
+  Portuguese: false
+  Romania: false
+  Russia: false
+  Spain: false
+  Sports: true
+  Sports DAZN/NFL/UEFA GAMEPASS: false
+  Sports EPL EFL UEFA MLS: false
+  Sports ESPN+: false
+  Sports Events 2023: true
+  Sports MLB: false
+  Sports NBA NCAAB NCAAW: false
+  Sports NFL NCAAF: false
+  Sports NHL: false
+  Sports PPV: false
+  Sports UFC BOXING WWE: false
+  UK: false
+  US: true
+  
+# US Local filtering, separate from True/False flag logic
+us_local_filtering:
+  enabled: true
+  allowed_tvg_names:
+    - "abc.wsoc.charlotte.nc.us"
+    - "cbs.wbtv.charlotte.nc.us"
+    - "fox.wjzy.charlotte.nc.us"
+    - "mnt.wmyt.charlotte.nc.us"
+    - "nbc.wcnc.charlotte.nc.us"
+
+# FFmpeg command profile settings
 ffmpeg:
   command:
-    input_url: "{url}"
-    reconnect: "1"
-    reconnect_streamed: "1"
-    reconnect_delay_max: "4294"
-    analyzeduration: "10000000"
-    probesize: "10000000"
-    re: "1"
-    thread_queue_size: "4096"
-    rtbufsize: "2048k"
-    map: "0"
-    video_codec: "libx264"
-    audio_codec: "ac3"
-    audio_bitrate: "128k"
-    audio_channels: "2"
-    strict: "experimental"
-    pix_fmt: "yuv420p"
-    bf: "2"
-    preset: "llhp"
-    tune: "ull"
-    rc: "vbr"
-    multipass: "1"
-    fflags: "discardcorrupt"
-    timeout: "10"
-    muxdelay: "0.1"
-    max_interleave_delta: "0.1"
-    output_format: "mpegts"
-    async: "1"
-    copyts: "1"
+    input_url: "{streamUrl}"                       # Input URL for the stream
+    reconnect: "1"                                 # Enable reconnecting on connection loss
+    reconnect_streamed: "1"                        # Reconnect for streamed content
+    reconnect_delay_max: "4294"                    # Maximum reconnection delay in milliseconds
+    analyzeduration: "2000000"                     # Duration to analyze the input stream (in microseconds)
+    probesize: "10000000"                          # Probe size for stream inspection (in bytes)
+    rtbufsize: "5M"                                # Real-time buffer size for live streams
+    thread_queue_size: "4096"                      # Number of packets to buffer during decoding
+    map_metadata: "-1"                             # Map metadata
+    map_chapters: "-1"                             # Map chapters
+    map_0_0: "-map 0:0"                           # Map first video stream
+    map_0_1: "-map 0:1"                           # Map first audio stream
+    map_no_subs: "-map -0:s"                       # No subtitles
+    video_codec: "libx264"                         # Video codec
+    pix_fmt: "yuv420p"                             # Pixel format
+    preset: "fast"                                 # Encoding preset
+    tune: "film"                                  # Tuning for film content
+    crf: "23"                                      # Constant Rate Factor
+    maxrate: "8000000"                             # Maximum bitrate
+    bufsize: "16000000"                            # Buffer size
+    profile_v: "main"                              # Video profile
+    level: "4.1"                                   # Video level
+    x264opts: "subme=0:me_range=4:rc_lookahead=10:partitions=none"  # Custom x264 options
+    force_key_frames: '"expr:gte(t,n_forced*3)"'   # Force key frames every 3 seconds
+    vf: "yadif=0:-1:0"                             # Deinterlacing filter
+    audio_codec: "aac"                             # Audio codec
+    ac: "2"                                        # Audio channels
+    b_audio: "192k"                                # Audio bitrate
+    output_format: "mpegts"                        # Output format (TS)
+    copyts: "1"                                    # Copy timestamps
+    async: "1"                                     # Audio-video sync
+    movflags: "+faststart"                         # Fast start for web playback
+    pipe: "1"                                      # Pipe the output
 
